@@ -9,16 +9,16 @@ import UIKit
 import AVFoundation
 
 class RecordViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
-
+    
     
     
     @IBOutlet weak var recordButtonLabel: UIButton!
     
     @IBOutlet weak var playButtonLabel: UIButton!
     
-//    var recordButtonLabel: UIButton!
-//    var playButtonLabel: UIButton!
-
+    //    var recordButtonLabel: UIButton!
+    //    var playButtonLabel: UIButton!
+    
     var audioRecorder: AVAudioRecorder!
     var audioPlayer: AVAudioPlayer!
     var recordingSession: AVAudioSession!
@@ -31,132 +31,86 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPl
         checkRecordPermission()
     }
     
-    func checkRecordPermission(){
-        recordingSession = AVAudioSession.sharedInstance()
-
-        do {
-            try recordingSession.setCategory(.playAndRecord, mode: .default)
-            try recordingSession.setActive(true)
-            recordingSession.requestRecordPermission() { [unowned self] allowed in
-                DispatchQueue.main.async {
-                    if allowed {
-                        isAudioRecordingGranted = true
-                    } else {
-                        isAudioRecordingGranted = false
-                    }
-                }
-            }
-        } catch {
-            // failed to record!
-        }
-        
-        
-    }
-    
-    
-    func getDocumentsDirectory() -> URL {
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        print(paths)
-        return paths[0]
-    }
-    
-    func getFileUrl() -> URL
-    {
-        let filename = "recording.m4a"
-        let filePath = getDocumentsDirectory().appendingPathComponent(filename)
-        return filePath
-    }
-    
-    
-//    func loadRecordingUI() {
-//        recordButtonLabel = UIButton(frame: CGRect(x: 64, y: 64, width: 300, height: 64))
-//        recordButtonLabel.backgroundColor = .blue
-//        recordButtonLabel.setTitle("Tap to Record", for: .normal)
-//        recordButtonLabel.titleLabel?.font = UIFont.preferredFont(forTextStyle: .title1)
-//        recordButtonLabel.addTarget(self, action: #selector(recordTapped), for: .touchUpInside)
-//        view.addSubview(recordButtonLabel)
-//    }
-    
-    
-    
-    
-//    func loadPlayUI(){
-//        playButtonLabel = UIButton(frame: CGRect(x: 64, y: 264, width: 300, height: 64))
-//        playButtonLabel.backgroundColor = .red
-//        playButtonLabel.setTitle("Tap to Play", for: .normal)
-//        playButtonLabel.titleLabel?.font = UIFont.preferredFont(forTextStyle: .title1)
-//        playButtonLabel.addTarget(self, action: #selector(playTapped), for: .touchUpInside)
-//        view.addSubview(playButtonLabel)
-//
-//
-//    }
-//
-    
-    
- 
-    
     
     func startRecording() {
         
         if isAudioRecordingGranted{
             recordingSession = AVAudioSession.sharedInstance()
-
             
-            let audioFilename = getDocumentsDirectory().appendingPathComponent("recording.m4a")
-
             let settings = [
                 AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
                 AVSampleRateKey: 12000,
                 AVNumberOfChannelsKey: 1,
                 AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
             ]
-
+            
             do {
-                audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
+                audioRecorder = try AVAudioRecorder(url: getFileUrl(), settings: settings)
                 audioRecorder.delegate = self
-                audioRecorder.record()
-
-                recordButtonLabel.setTitle("Tap to Stop", for: .normal)
+                audioRecorder.prepareToRecord()
+                
             } catch {
-                finishRecording(success: false)
+                // failed
             }
             
         }else{
             print("Recording is not permitted")
         }
         
- 
+        
     }
     
-    func finishRecording(success: Bool) {
-        audioRecorder.stop()
-        audioRecorder = nil
-
-        if success {
-            recordButtonLabel.setTitle("Tap to Re-record", for: .normal)
-        } else {
-            recordButtonLabel.setTitle("Tap to Record", for: .normal)
-            // recording failed :(
+    
+    @IBAction func recordButtonTapped(_ sender: UIButton) {
+        if(isRecording)
+        {
+            finishAudioRecording(success: true)
+            recordButtonLabel.setTitle("Record", for: .normal)
+            playButtonLabel.isEnabled = true
+            isRecording = false
         }
-    }
-    
-    @objc func recordTapped() {
-        if audioRecorder == nil {
+        else
+        {
             startRecording()
-        } else {
-            finishRecording(success: true)
+            
+            audioRecorder.record()
+            
+            recordButtonLabel.setTitle("Stop", for: .normal)
+            playButtonLabel.isEnabled = false
+            isRecording = true
         }
+        
+        
     }
     
-    
-    
-
-    
-    
-    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
-        if !flag {
-            finishRecording(success: false)
+    @IBAction func playButtonTapped(_ sender: UIButton) {
+        
+        if(isPlaying)
+        {
+            audioPlayer.stop()
+            recordButtonLabel.isEnabled = true
+            playButtonLabel.setTitle("Play", for: .normal)
+            isPlaying = false
         }
+        else
+        {
+            if FileManager.default.fileExists(atPath: getFileUrl().path)
+            {
+                recordButtonLabel.isEnabled = false
+                playButtonLabel.setTitle("pause", for: .normal)
+                prepare_play()
+                audioPlayer.play()
+                isPlaying = true
+            }
+            else
+            {
+                display_alert(msg_title: "Error", msg_desc: "Audio file is missing.", action_title: "OK")
+            }
+        }
+        
+        
+        
+        
     }
     
     
@@ -179,20 +133,80 @@ extension RecordViewController{
             print("Error")
         }
     }
-
     
     
     
-    @objc func playTapped(){
-        
-        if FileManager.default.fileExists(atPath: getFileUrl().path)
-                {
-        prepare_play()
-                    audioPlayer.play()
-        }else{
-            print("NO FILE")
+    
+    
+    
+    func finishAudioRecording(success: Bool)
+    {
+        if success
+        {
+            audioRecorder.stop()
+            audioRecorder = nil
+            print("recorded successfully.")
+        }
+        else
+        {
+            display_alert(msg_title: "Error", msg_desc: "Recording failed.", action_title: "OK")
         }
     }
     
     
+}
+
+
+extension RecordViewController{
+    //Check Permission and get file url
+    
+    
+    func checkRecordPermission(){
+        recordingSession = AVAudioSession.sharedInstance()
+        
+        do {
+            try recordingSession.setCategory(.playAndRecord, mode: .default)
+            try recordingSession.setActive(true)
+            recordingSession.requestRecordPermission() { [unowned self] allowed in
+                DispatchQueue.main.async {
+                    if allowed {
+                        isAudioRecordingGranted = true
+                    } else {
+                        isAudioRecordingGranted = false
+                    }
+                }
+            }
+        } catch {
+            // failed to record!
+        }
+    }
+    
+    
+    func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        print(paths)
+        return paths[0]
+    }
+    
+    func getFileUrl() -> URL
+    {
+        let filename = "recording.m4a"
+        let filePath = getDocumentsDirectory().appendingPathComponent(filename)
+        return filePath
+    }
+}
+
+
+extension RecordViewController{
+    
+    func display_alert(msg_title : String , msg_desc : String ,action_title : String)
+    {
+        let ac = UIAlertController(title: msg_title, message: msg_desc, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: action_title, style: .default)
+        {
+            (result : UIAlertAction) -> Void in
+            _ = self.navigationController?.popViewController(animated: true)
+        })
+        present(ac, animated: true)
+    }
 }
