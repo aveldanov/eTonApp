@@ -26,13 +26,15 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPl
     var isRecording = false
     var isPlaying = false
     
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         checkRecordPermission()
     }
     
     
-    func startRecording() {
+    func prepareToRecord() {
         
         if isAudioRecordingGranted{
             recordingSession = AVAudioSession.sharedInstance()
@@ -72,7 +74,7 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPl
         }
         else
         {
-            startRecording()
+            prepareToRecord()
             
             audioRecorder.record()
             
@@ -99,9 +101,10 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPl
         {
             if FileManager.default.fileExists(atPath: getFileUrl().path)
             {
+                reverse()
                 recordButtonLabel.isEnabled = false
                 playButtonLabel.setTitle("pause", for: .normal)
-                prepare_play()
+                prepareToPlay()
                 audioPlayer.play()
                 isPlaying = true
             }
@@ -111,13 +114,91 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPl
             }
         }
     }
+    
+    
+    
+    func reverse(){
+        
+        func getDocumentsDirectory() -> URL {
+            let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+            print(paths)
+            return paths[0]
+        }
+        
+        
+        
+        var outAudioFile:AudioFileID?
+        var pcm = AudioStreamBasicDescription(mSampleRate: 44100.0,
+                                              mFormatID: kAudioFormatLinearPCM,
+                                              mFormatFlags: kAudioFormatFlagIsBigEndian | kAudioFormatFlagIsSignedInteger,
+                                              mBytesPerPacket: 2,
+                                              mFramesPerPacket: 1,
+                                              mBytesPerFrame: 2,
+                                              mChannelsPerFrame: 1,
+                                              mBitsPerChannel: 16,
+                                              mReserved: 0)
+
+        var theErr = AudioFileCreateWithURL((getDocumentsDirectory() as CFURL?)!,
+                                            kAudioFileAIFFType,
+                                            &pcm,
+                                            .eraseFile,
+                                            &outAudioFile)
+        if noErr == theErr, let outAudioFile = outAudioFile {
+            var inAudioFile:AudioFileID?
+            theErr = AudioFileOpenURL(getFileUrl() as CFURL, .readPermission, 0, &inAudioFile)
+
+            if noErr == theErr, let inAudioFile = inAudioFile {
+
+                var fileDataSize:UInt64 = 0
+                var thePropertySize:UInt32 = UInt32(MemoryLayout<UInt64>.stride)
+                theErr = AudioFileGetProperty(inAudioFile,
+                                              kAudioFilePropertyAudioDataByteCount,
+                                              &thePropertySize,
+                                              &fileDataSize)
+
+                if( noErr == theErr) {
+                    let dataSize:Int64 = Int64(fileDataSize)
+                    let theData = UnsafeMutableRawPointer.allocate(byteCount: Int(dataSize),
+                                                                   alignment: MemoryLayout<UInt8>.alignment)
+
+                    var readPoint:Int64 = Int64(dataSize)
+                    var writePoint:Int64 = 0
+
+                    while( readPoint > 0 )
+                    {
+                        var bytesToRead = UInt32(2)
+
+                        AudioFileReadBytes( inAudioFile, false, readPoint, &bytesToRead, theData)
+                        AudioFileWriteBytes( outAudioFile, false, writePoint, &bytesToRead, theData)
+
+                        writePoint += 2
+                        readPoint -= 2
+                    }
+
+                    theData.deallocate()
+
+                    AudioFileClose(inAudioFile);
+                    AudioFileClose(outAudioFile);
+                }
+            }
+        }
+        
+        
+        
+        
+        
+        
+    }
+    
+    
+    
 }
 
 
 
 extension RecordViewController{
     
-    func prepare_play()
+    func prepareToPlay()
     {
         do
         {
@@ -205,4 +286,25 @@ extension RecordViewController{
         })
         present(ac, animated: true)
     }
+    
+    
+    
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
+        if !flag {
+            audioRecorder.stop()
+            audioRecorder = nil
+        }
+    }
+    
+    
+    
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        if !flag{
+            audioPlayer.stop()
+            audioPlayer = nil
+        }
+    }
 }
+
+
+
