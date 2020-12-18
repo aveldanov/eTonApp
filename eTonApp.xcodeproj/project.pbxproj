@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		213201EA258C860500233FB9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213201E9258C860500233FB9 /* AppDelegate.swift */; };
 		213201EC258C860500233FB9 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213201EB258C860500233FB9 /* SceneDelegate.swift */; };
-		213201EE258C860500233FB9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213201ED258C860500233FB9 /* ViewController.swift */; };
+		213201EE258C860500233FB9 /* RecordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213201ED258C860500233FB9 /* RecordViewController.swift */; };
 		213201F1258C860500233FB9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 213201EF258C860500233FB9 /* Main.storyboard */; };
 		213201F4258C860500233FB9 /* eTonApp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 213201F2258C860500233FB9 /* eTonApp.xcdatamodeld */; };
 		213201F6258C860800233FB9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 213201F5258C860800233FB9 /* Assets.xcassets */; };
@@ -20,7 +20,7 @@
 		213201E6258C860500233FB9 /* eTonApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = eTonApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		213201E9258C860500233FB9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		213201EB258C860500233FB9 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		213201ED258C860500233FB9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		213201ED258C860500233FB9 /* RecordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordViewController.swift; sourceTree = "<group>"; };
 		213201F0258C860500233FB9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		213201F3258C860500233FB9 /* eTonApp.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = eTonApp.xcdatamodel; sourceTree = "<group>"; };
 		213201F5258C860800233FB9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -60,7 +60,7 @@
 			children = (
 				213201E9258C860500233FB9 /* AppDelegate.swift */,
 				213201EB258C860500233FB9 /* SceneDelegate.swift */,
-				213201ED258C860500233FB9 /* ViewController.swift */,
+				213201ED258C860500233FB9 /* RecordViewController.swift */,
 				213201EF258C860500233FB9 /* Main.storyboard */,
 				213201F5258C860800233FB9 /* Assets.xcassets */,
 				213201F7258C860800233FB9 /* LaunchScreen.storyboard */,
@@ -140,7 +140,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				213201EE258C860500233FB9 /* ViewController.swift in Sources */,
+				213201EE258C860500233FB9 /* RecordViewController.swift in Sources */,
 				213201EA258C860500233FB9 /* AppDelegate.swift in Sources */,
 				213201EC258C860500233FB9 /* SceneDelegate.swift in Sources */,
 				213201F4258C860500233FB9 /* eTonApp.xcdatamodeld in Sources */,
