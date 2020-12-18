@@ -60,6 +60,7 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPl
         
     }
     
+    //MARK: - Record
     
     @IBAction func recordButtonTapped(_ sender: UIButton) {
         if(isRecording)
@@ -82,6 +83,8 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPl
         
         
     }
+    
+    //MARK: - Play
     
     @IBAction func playButtonTapped(_ sender: UIButton) {
         
@@ -107,14 +110,7 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPl
                 display_alert(msg_title: "Error", msg_desc: "Audio file is missing.", action_title: "OK")
             }
         }
-        
-        
-        
-        
     }
-    
-    
-    
 }
 
 
