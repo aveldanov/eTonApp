@@ -174,9 +174,9 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPl
                         writePoint += 2
                         readPoint -= 2
                     }
+                    print("DATA: ", theData)
 
                     theData.deallocate()
-
                     AudioFileClose(inAudioFile);
                     AudioFileClose(outAudioFile);
                 }
@@ -261,7 +261,7 @@ extension RecordViewController{
     
     func getDocumentsDirectory() -> URL {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        print(paths)
+//        print(paths)
         return paths[0]
     }
     
